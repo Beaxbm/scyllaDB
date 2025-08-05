@@ -1,0 +1,16 @@
+homeassistant: true
+permit_join: true
+mqtt:
+  server: mqtts://mosquitto:8883
+  base_topic: zigbee2mqtt
+  reject_unauthorized: false
+  ca: /app/data/ca.crt
+serial:
+  port: /dev/ttyUSB0
+  adapter: ember            # ou cc2531/cc26x2, conforme seu dongle
+frontend:
+  enabled: true
+  port: 8080
+advanced:
+  log_level: debug
+version: 4

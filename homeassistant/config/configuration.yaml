@@ -1,0 +1,52 @@
+#################################################
+# Básico do Home Assistant
+#################################################
+homeassistant:
+  name: HexaHealth Home
+  latitude: -8.052235
+  longitude: -34.881300
+  elevation: 10
+  unit_system: metric
+  time_zone: America/Recife
+
+#################################################
+# Logger (opcional, ajuda no debug)
+#################################################
+logger:
+  default: info
+  logs:
+    homeassistant.core: warning
+    zigbee2mqtt: debug
+
+#################################################
+# Integração MQTT com Mosquitto
+#################################################
+mqtt:
+  broker: mosquitto
+  port: 1883
+  # se habilitou autenticação no Mosquitto, configure aqui:
+  username: !secret mqtt_user
+  password: !secret mqtt_password
+  discovery: true
+  discovery_prefix: homeassistant
+
+#################################################
+# Integração InfluxDB para histórico de métricas
+#################################################
+influxdb:
+  api_version: 2
+  host: influxdb
+  port: 8086
+  token: !secret influxdb_token
+  organization: hexahealthHQ
+  bucket: medassistant
+  default_measurement: state
+
+#################################################
+# Includes de automações, scripts, cenas, temas…
+#################################################
+automation: !include automations.yaml
+script:    !include scripts.yaml
+scene:     !include scenes.yaml
+theme:     !include themes.yaml
+
