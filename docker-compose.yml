@@ -1,46 +1,15 @@
-version: '3.8'
-
 services:
   mosquitto:
-    image: eclipse-mosquitto
+    image: eclipse-mosquitto:2
     container_name: mosquitto
     restart: unless-stopped
     ports:
-      - '1883:1883'
-      - '8883:8883'
+      - "1883:1883"
+      - "8883:8883"
     volumes:
       - ./mosquitto/config:/mosquitto/config
       - ./mosquitto/data:/mosquitto/data
       - ./mosquitto/log:/mosquitto/log
-
-  zigbee2mqtt:
-    image: koenkk/zigbee2mqtt:latest
-    container_name: zigbee2mqtt
-    restart: unless-stopped
-    depends_on:
-      - mosquitto
-    ports:
-      - '8080:8080'
-    volumes:
-      - ./zigbee2mqtt/data:/app/data
-    devices:
-      - /dev/ttyUSB0:/dev/ttyUSB0
-
-  influxdb:
-    image: influxdb:2.7
-    container_name: influxdb
-    restart: unless-stopped
-    ports:
-      - '8086:8086'
-    volumes:
-      - ./influxdb:/var/lib/influxdb2
-    environment:
-      - DOCKER_INFLUXDB_INIT_MODE=setup
-      - DOCKER_INFLUXDB_INIT_USERNAME=admin
-      - DOCKER_INFLUXDB_INIT_PASSWORD=adminpass
-      - DOCKER_INFLUXDB_INIT_ORG=hexahealthHQ
-      - DOCKER_INFLUXDB_INIT_BUCKET=medassistant
-      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=AisKMJ5IKY6Dajjnd6JTjlE7QfYY2jtct4ytaDzbTTxJ_O5Wjkus3YXzF89AxsIimi3kEPX6ynDfQxuFzoDgpw==
 
   homeassistant:
     image: homeassistant/home-assistant:stable
@@ -48,18 +17,7 @@ services:
     restart: unless-stopped
     depends_on:
       - mosquitto
-      - influxdb
+    ports:
+      - "8123:8123"
     volumes:
       - ./homeassistant:/config
-    environment:
-      - TZ=America/Recife
-    network_mode: host
-
-networks:
-  default:
-    driver: bridge
-
-volumes:
-  mosquitto_data:
-  mosquitto_log:
-  influxdb_data:

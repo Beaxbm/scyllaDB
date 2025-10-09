@@ -1,0 +1,28 @@
+# Docker volumes and data
+mosquitto/data/
+mosquitto/log/
+homeassistant/.storage/
+homeassistant/deps/
+homeassistant/tts/
+homeassistant/home-assistant.log*
+zigbee2mqtt/data/
+influxdb/
+
+# Keep config directories but ignore sensitive data
+homeassistant/secrets.yaml
+homeassistant/.uuid
+homeassistant/core.*
+homeassistant/entity_registry.yaml
+homeassistant/device_registry.yaml
+homeassistant/.google.token
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log

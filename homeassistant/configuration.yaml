@@ -1,0 +1,28 @@
+#################################################
+# Básico do Home Assistant
+#################################################
+homeassistant:
+  name: HexaHealth Home
+  time_zone: America/Recife
+
+logger:
+  default: info
+
+# Remove old connection options; MQTT is configured via UI
+# You may omit this block entirely, or leave it empty.
+mqtt: {}
+
+mqtt_statestream:
+  base_topic: ha/statestream
+  publish_attributes: true
+  publish_timestamps: true
+  include:
+    domains:
+      - sensor
+      - binary_sensor
+
+automation: !include automations.yaml
+script:    !include scripts.yaml
+scene:     !include scenes.yaml
+theme:     !include themes.yaml
+
