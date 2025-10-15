@@ -1,3 +1,5 @@
+
+# Core Home Assistant + MQTT Infrastructure
 services:
   mosquitto:
     image: eclipse-mosquitto:2
@@ -10,6 +12,8 @@ services:
       - ./mosquitto/config:/mosquitto/config
       - ./mosquitto/data:/mosquitto/data
       - ./mosquitto/log:/mosquitto/log
+    environment:
+      - TZ=America/Recife
 
   homeassistant:
     image: homeassistant/home-assistant:stable
@@ -21,3 +25,22 @@ services:
       - "8123:8123"
     volumes:
       - ./homeassistant:/config
+    environment:
+      - TZ=America/Recife
+
+  # Optional: Zigbee2MQTT (comment out if no USB adapter)
+  # zigbee2mqtt:
+  #   image: koenkk/zigbee2mqtt:latest
+  #   container_name: zigbee2mqtt
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - mosquitto
+  #   ports:
+  #     - "8080:8080"
+  #   volumes:
+  #     - ./zigbee2mqtt/data:/app/data
+  #     - /run/udev:/run/udev:ro
+  #   devices:
+  #     - /dev/ttyUSB0:/dev/ttyUSB0  # Your Zigbee USB adapter
+  #   environment:
+  #     - TZ=America/Recife

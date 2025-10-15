@@ -12,6 +12,24 @@ logger:
 # You may omit this block entirely, or leave it empty.
 mqtt: {}
 
+# Template sensors for testing
+template:
+  - sensor:
+      - name: "Test Temperature"
+        unit_of_measurement: "°C"
+        device_class: temperature
+        state: "{{ (range(18, 30) | random) + (range(0, 9) | random / 10) }}"
+        
+      - name: "Test Humidity" 
+        unit_of_measurement: "%"
+        device_class: humidity
+        state: "{{ range(40, 80) | random }}"
+        
+  - binary_sensor:
+      - name: "Test Door"
+        device_class: door
+        state: "{{ (now().minute % 2) == 0 }}"
+
 mqtt_statestream:
   base_topic: ha/statestream
   publish_attributes: true

@@ -1,0 +1,103 @@
+# ScyllaDB IoT Infrastructure - Runs alongside existing setup
+version: '3.8'
+
+services:
+
+  # ScyllaDB cluster (single node for development, scale to 3+ for production)
+  scylla-node1:
+    image: scylladb/scylla:5.4
+    container_name: scylla-node1
+    restart: unless-stopped
+    command: >
+      --seeds=scylla-node1
+      --smp 2
+      --memory 2G
+      --overprovisioned 1
+      --api-address 0.0.0.0
+    ports:
+      - "9042:9042"  # CQL
+      - "9180:9180"  # REST API
+      - "19042:19042" # Prometheus metrics
+    volumes:
+      - ./scylla/data:/var/lib/scylla
+      - ./scylla/init:/docker-entrypoint-initdb.d
+    environment:
+      - TZ=America/Recife
+    healthcheck:
+      test: ["CMD-SHELL", "cqlsh -e 'DESCRIBE KEYSPACES' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Unified MQTT-to-ScyllaDB ingestor
+  scylla-ingestor:
+    build: ./services/iot_ingestor
+    container_name: scylla-ingestor
+    restart: unless-stopped
+    depends_on:
+      scylla-node1:
+        condition: service_healthy
+    environment:
+      MQTT_HOST: mosquitto  # Connect to mosquitto container
+      MQTT_PORT: 1883
+      SCYLLA_HOSTS: scylla-node1
+      SCYLLA_KEYSPACE: iot
+      TENANT_ID: gauge
+      SITE_ID: recife
+      LOG_LEVEL: INFO
+      TZ: America/Recife
+    external_links:
+      - mosquitto:mosquitto
+
+  # Enhanced API with ScyllaDB backend
+  scylla-api:
+    build: ./services/scylla_api
+    container_name: scylla-api
+    restart: unless-stopped
+    depends_on:
+      scylla-node1:
+        condition: service_healthy
+    ports:
+      - "8001:8000"  # Different port to avoid conflict
+    environment:
+      SCYLLA_HOSTS: scylla-node1
+      SCYLLA_KEYSPACE: iot
+      TENANT_ID: gauge
+      SITE_ID: recife
+      TZ: America/Recife
+
+  # Optional: Zigbee2MQTT (uncomment when you have USB adapter)
+  # zigbee2mqtt:
+  #   image: koenkk/zigbee2mqtt:latest
+  #   container_name: zigbee2mqtt
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - mosquitto
+  #   ports:
+  #     - "8080:8080"
+  #   volumes:
+  #     - ./zigbee2mqtt/data:/app/data
+  #     - /run/udev:/run/udev:ro
+  #   devices:
+  #     - /dev/ttyUSB0:/dev/ttyUSB0
+  #   environment:
+  #     - TZ=America/Recife
+
+  # Optional: ScyllaDB monitoring
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./monitoring/grafana:/var/lib/grafana
+      - ./monitoring/dashboards:/etc/grafana/provisioning
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      TZ: America/Recife
+    profiles:
+      - monitoring
+
+volumes:
+  scylla_data:

@@ -18,8 +18,16 @@ homeassistant/.storage/
 homeassistant/deps/
 homeassistant/tts/
 homeassistant/home-assistant.log*
+homeassistant/backups/
 zigbee2mqtt/data/
 influxdb/
+
+# ScyllaDB data files - database runtime files
+scylla/data/
+scylla/data/data/
+scylla/data/commitlog/
+scylla/data/hints/
+scylla/data/view_hints/
 
 # Keep config directories but ignore sensitive data
 homeassistant/secrets.yaml
@@ -55,4 +63,3 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-package-lock.json
