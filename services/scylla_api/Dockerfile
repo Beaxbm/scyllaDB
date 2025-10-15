@@ -13,10 +13,10 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application
-COPY simple_api.py .
+COPY . .
 
 # Expose port
 EXPOSE 8000
 
-# Run the application
+# Run the simple API for now (real-time API needs debugging)
 CMD ["python", "-u", "simple_api.py"]

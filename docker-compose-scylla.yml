@@ -49,7 +49,7 @@ services:
     external_links:
       - mosquitto:mosquitto
 
-  # Enhanced API with ScyllaDB backend
+  # Enhanced API with ScyllaDB backend and real-time WebSocket support
   scylla-api:
     build: ./services/scylla_api
     container_name: scylla-api
@@ -62,9 +62,13 @@ services:
     environment:
       SCYLLA_HOSTS: scylla-node1
       SCYLLA_KEYSPACE: iot
+      MQTT_HOST: mosquitto
+      MQTT_PORT: 1883
       TENANT_ID: gauge
       SITE_ID: recife
       TZ: America/Recife
+    external_links:
+      - mosquitto:mosquitto
 
   # Optional: Zigbee2MQTT (uncomment when you have USB adapter)
   # zigbee2mqtt:
